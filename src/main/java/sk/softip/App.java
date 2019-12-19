@@ -12,12 +12,12 @@ public class App
     public static void main( String[] args ) throws FileNotFoundException {
         //inicializacia a nacitania udajov zo vstupneho suboru inventuravzor.csv
         ArrayList<Property> properties  = null;
-        properties = ReadFromCSV.readProperty("src/files/inventuraVzor.csv");
+        properties = ReadFromCSV.readProperty("inventuraVzor.csv");
         //prejdenie vsetkych objektov v arrayliste properties
         //osetrenie vstupu
-        String file = "removed";
-        file = file.toUpperCase();
-        //string file = args[0].touppercase();
+        //String file = "removed";
+        //file = file.toUpperCase();
+        String file = args[0].toUpperCase();
 
          for (Property p : properties){
              switch (file) {
@@ -58,7 +58,7 @@ public class App
 
         //zapisanie do subora
         try {
-            WriteToFile.writeToFile(valuesArray, "src/files/"+file+".txt",false);
+            WriteToFile.writeToFile(valuesArray, file+".txt",false);
         } catch (IOException e) {
             e.printStackTrace();
         }

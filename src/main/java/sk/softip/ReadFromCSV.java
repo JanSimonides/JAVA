@@ -22,7 +22,7 @@ public class ReadFromCSV {
         //System.out.println(u);
         {
             try {
-                br = new BufferedReader(Files.newBufferedReader(pathToFile.toAbsolutePath(),StandardCharsets.UTF_8));
+                br = new BufferedReader(Files.newBufferedReader(pathToFile,StandardCharsets.UTF_8));
                 //nacitanie prveho riadku s udajmi hlavicky
                 line = br.readLine();
                 line = br.readLine();

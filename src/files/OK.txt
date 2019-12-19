@@ -1,4 +1,0 @@
-20;Majetok315;Room619;1;1220.15;2012-11-21;null;O
-2;Majetok15;Room19;0;120.15;2010-01-01;null;O
-1;Majetok1;Room1;0;12.15;2010-01-01;null;O
-3;Majetok100;Room125;0;12.2;2010-01-01;null;O
