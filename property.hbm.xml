@@ -1,0 +1,22 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE hibernate-mapping PUBLIC
+        "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping>
+    <class name="sk.softip.Property" table="Property">
+
+        <id name = "propertyId" type = "int" column = "propertyId">
+        </id>
+
+        <property name="propertyName"></property>
+        <property name="propertyRoom"></property>
+        <property name="propertyType"></property>
+        <property name="propertyPrice"></property>
+        <property name="propertyInDate"></property>
+        <property name="propertyOutDate"></property>
+        <property name="propertyState"></property>
+
+    </class>
+
+</hibernate-mapping>
