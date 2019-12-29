@@ -5,9 +5,11 @@ import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityTransaction;
 import javax.persistence.Persistence;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.InputStream;
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.logging.FileHandler;
 import java.util.logging.Logger;
 
 public class App
@@ -18,17 +20,23 @@ public class App
      //arraylist bez typu mozu sa ukladat stringy pre ROOMS a objekty majetku pre ostatne podmienky
     private static ArrayList valuesArray = new ArrayList<>();
     private final static Logger logger = Logger.getLogger(Property.class.getName());
-    private static EntityManagerFactory entityManagerFactory = Persistence.createEntityManagerFactory("softipbase");
-
+     private static EntityManagerFactory entityManagerFactory = Persistence.createEntityManagerFactory("softipbase");
     public static void main( String[] args ) throws FileNotFoundException, SQLException, ClassNotFoundException {
+
+        // nastavenie log suboru do ktoreho sa ukladaju vypisy
+        logger.setUseParentHandlers(false);
+        FileHandler appLog = null;
+        try {
+            appLog = new FileHandler("Files/Property.log");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        logger.addHandler(appLog);
+        logger.info("ZAciatok");
         if (args.length>10) {
             System.out.println("Chyba");
             System.exit(0);
         }
-
-        InputStream stream = App.class.getResourceAsStream("META-INF/persistence.xml");
-        System.out.println(stream != null);
-
 
         //rozdelenie vstupnych parametrov
        /* String[] input = String.join( " ", args ).split("[, ]");

@@ -52,7 +52,7 @@ public class Property implements Serializable {
         this.propertyPrice = Float.parseFloat(parameters[4].substring(0, parameters[4].length() - 3).replace(",","."));
         this.propertyInDate =LocalDate.parse(parameters[5].substring(0,4)+"-" + parameters[5].substring(4,6)+"-"+ parameters[5].substring(6,8));
         this.propertyState = parameters[7].charAt(0);
-       // logger.info("Zaevidovanie majektu");
+         logger.info("Zaevidovanie majektu");
     }
 
     public int getPropertyId() {
