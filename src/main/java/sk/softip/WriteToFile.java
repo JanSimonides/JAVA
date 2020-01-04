@@ -10,7 +10,7 @@ public class WriteToFile {
     {
 
         FileWriter fileWriter = new FileWriter(fileName,append);
-
+        fileWriter.write("ID;NAME;ROOM;TYPE;PRICE;IN_DATE;OUT_DATE;STATE\n");
         fileWriter.write(element.toString().replace("[","").replace(" ",";").replace(",","\n").replaceAll("\n;","\n").replace("]",""));
         fileWriter.close();
     }

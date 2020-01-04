@@ -1,122 +1,133 @@
 package sk.softip;
 
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.EntityTransaction;
-import javax.persistence.Persistence;
+import org.apache.log4j.Logger;
+import org.apache.log4j.PropertyConfigurator;
+
+import javax.persistence.*;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
 import java.sql.*;
 import java.util.ArrayList;
-import java.util.logging.FileHandler;
-import java.util.logging.Logger;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+
 
 public class App
 {
+    //arraylist bez typu mozu sa ukladat stringy pre ROOMS a objekty majetku pre ostatne podmienky
+    //private static ArrayList valuesArray = new ArrayList<>();
 
+    private final static Logger logger = Logger.getLogger(App.class);
+    private static EntityManagerFactory entityManagerFactory = Persistence.createEntityManagerFactory("softipbase");
 
-
-     //arraylist bez typu mozu sa ukladat stringy pre ROOMS a objekty majetku pre ostatne podmienky
-    private static ArrayList valuesArray = new ArrayList<>();
-    private final static Logger logger = Logger.getLogger(Property.class.getName());
-     private static EntityManagerFactory entityManagerFactory = Persistence.createEntityManagerFactory("softipbase");
     public static void main( String[] args ) throws FileNotFoundException, SQLException, ClassNotFoundException {
 
-        // nastavenie log suboru do ktoreho sa ukladaju vypisy
-        logger.setUseParentHandlers(false);
-        FileHandler appLog = null;
-        try {
-            appLog = new FileHandler("Files/Property.log");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        logger.addHandler(appLog);
-        logger.info("ZAciatok");
-        if (args.length>10) {
-            System.out.println("Chyba");
-            System.exit(0);
-        }
+        PropertyConfigurator.configure("src/main/resources/log4j.properties");
 
         //rozdelenie vstupnych parametrov
-       /* String[] input = String.join( " ", args ).split("[, ]");
+        String[] input = String.join( " ", args ).split("[, ]");
+        if (input.length > 10) {
+            logger.error("Chyba zadal si prilis vela parametrov: "+input.length);
+            //System.out.println("Chyba zadal si prilis vela parametrov: "+input.length);
+            System.exit(0);
+        }
+        //pridanie pripny csv a kontrola duplikatov
+        ArrayList<String> inputs = new ArrayList<String>();
         int i;
         for (i=0; i<input.length;i++){
-            input[i] = input[i]+".csv";
-            System.out.println(input[i]);
-        }*/
+            input[i]= input[i]+".csv";
+            if (!inputs.contains(input[i])){
+                inputs.add(input[i]);
+            }
+            else {
+                logger.error("Pokus o opakovany import: "+input[i]);
+                System.out.println(input[i] + " bol zadany viackrat (nacital sa len raz)");
+            }
+        }
 
-       //docasne testovanie
-       String[] input = new String[2];
-        input[0] = "inventuraVzor1.csv";
-        input[1] = "inventuraVzor2.csv";
 
-       //inicializacia a nacitania udajov zo vstupneho suboru inventuravzor.csv
-        ArrayList<Property> properties  = null;
-        properties = ReadFromCSV.readProperty(input);
-        //prejdenie vsetkych objektov v arrayliste properties
-        //osetrenie vstupu
-        //String file = "removed";
-        //file = file.toUpperCase();
-//        String file = args[0].toUpperCase();
+        //inicializacia a nacitania udajov zo vstupnych suborov inventuravzor[i].csv
+        ArrayList<Property> properties = null;
+        properties = ReadFromCSV.readProperty(inputs);
+
         EntityManager em = entityManagerFactory.createEntityManager();
         EntityTransaction entityTransaction = null;
 
-        entityTransaction= em.getTransaction();
-        entityTransaction.begin();
+        entityTransaction = em.getTransaction();
 
-        for (Property p : properties){
-            em.persist(p);
-            entityTransaction.commit();
+        for (Property p : properties) {
+            if(Property.propertyValidation(p)) {
+                entityTransaction.begin();
+                em.persist(p);
+                entityTransaction.commit();
+            }
+            else {
+                logger.warn("Udaj nebol pridany do databazy: "+p.toString());
+            }
         }
+
+        //list na nacitanie hodnot z databazy
+        List<Property> propertyList;
+
+        propertyList = Property.getProperties(em);
+        System.out.println(propertyList);
+
 
         entityManagerFactory.close();
-        //funkcionalita vyhladavania konkretnych udajov
-         /*for (Property p : properties){
-             switch (file) {
-                 case "ROOMS":
-                     if (!valuesArray.contains(p.getPropertyRoom())) {
-                         valuesArray.add(p.getPropertyRoom());
-                     }
-                     break;
-                 case "MISSING":
-                     if (p.getPropertyState() == 'M') {
-                         valuesArray.add(p);
-                         valuesArray.sort(Comparator.comparing(x-> p.getPropertyPrice()));
-                     }
-                     break;
-                 case "MOVED":
-                     if (p.getPropertyState() == 'V') {
-                         valuesArray.add(p);
-                         valuesArray.sort(Comparator.comparing(x -> p.getPropertyInDate()));
-                     }
-                     break;
-                 case "OK":
-                     if (p.getPropertyState() == 'O') {
-                         valuesArray.add(p);
-                         valuesArray.sort(Comparator.comparing(x-> p.getPropertyPrice()));
-                         Collections.reverse(valuesArray);
-                     }
-                     break;
-                 case "REMOVED":
-                     if (p.getPropertyOutDate() != null) {
-                         valuesArray.add(p);
-                     }
-                     break;
-                 default:
-                     System.out.println("Zadal si zly subor vypinam...");
-                     System.exit(0);
-             }
-        }*/
 
-        /*zapisanie do subora
-        try {
-            WriteToFile.writeToFile(valuesArray, file+".txt",false);
-        } catch (IOException e) {
-            e.printStackTrace();
+        // knotrola a zoradenie a zapis udajov
+        ArrayList<Property> missing = new ArrayList<Property>();
+        ArrayList<Property> moved = new ArrayList<Property>();
+        ArrayList<Property> ok = new ArrayList<Property>();
+        ArrayList<Property> removed = new ArrayList<Property>();
+
+
+        for (Property p : propertyList) {
+            if (p.getPropertyState() == 'M') {
+
+                missing.add(p);
+                missing.sort(Comparator.comparing(x -> p.getPropertyPrice()));
+
+                try {
+                    WriteToFile.writeToFile(missing, "Files/MISSING.txt", false);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+            if (p.getPropertyState() == 'V') {
+                moved.add(p);
+                moved.sort(Comparator.comparing(x -> p.getPropertyInDate()));
+
+                try {
+                    WriteToFile.writeToFile(moved, "Files/MOVED.txt", false);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            if (p.getPropertyState() == 'O') {
+                ok.add(p);
+                ok.sort(Comparator.comparing(x -> p.getPropertyPrice()));
+                Collections.reverse(ok);
+                try {
+                    WriteToFile.writeToFile(ok, "Files/OK.txt", false);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            if (p.getPropertyOutDate() != null) {
+                removed.add(p);
+                try {
+                    WriteToFile.writeToFile(removed, "Files/REMOVED.txt", false);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+
         }
-        */
-        //System.out.println("hotovo");*/
+
     }
 }
 

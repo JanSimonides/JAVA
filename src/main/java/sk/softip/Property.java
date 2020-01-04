@@ -1,40 +1,39 @@
 package sk.softip;
+import org.apache.log4j.Logger;
 
 import javax.persistence.*;
-import javax.transaction.Transactional;
+import javax.validation.Valid;
 import java.io.Serializable;
-import java.sql.*;
 import java.time.LocalDate;
-import java.util.Date;
-import java.util.logging.Logger;
+import java.util.List;
 
 @Entity
-@Table(name = "Property", uniqueConstraints = {
-@UniqueConstraint(columnNames = "propertyId")})
-
+@Table(name = "Property")
+@Valid
 public class Property implements Serializable {
     private static  final long serialVersionUID = 1L;
-    @PersistenceContext
-    private EntityManager entityManager;
 
-    private final static Logger logger = Logger.getLogger(Property.class.getName());
     @Id
-    @Column(name = "propertyId", unique = true, nullable = false)
+    @Column(name = "property_ID", unique = true, nullable = false)
     private int propertyId;
-    @Column(name = "propertyName", unique = true, nullable = false)
+    @Column(name = "property_Name", unique = true, nullable = false)
     private  String propertyName;
-    @Column(name = "propertyRoom")
+    @Column(name = "property_Room")
     private  String propertyRoom;
-    @Column(name = "propertyType", nullable = false)
+    @Column(name = "property_Type", nullable = false)
     private int propertyType;
-    @Column(name = "propertyPrice", nullable = false)
+    @Column(name = "property_Price", nullable = false)
     private float propertyPrice;
-    @Column(name = "propertyInDate", nullable = false)
+    @Column(name = "property_In_date", nullable = false)
     private LocalDate propertyInDate;
-    @Column(name = "propertyOutDate", unique = true, nullable = true)
+    @Column(name = "property_Out_date", unique = true)
     private LocalDate propertyOutDate;
-    @Column(name = "propertyState")
+    @Column(name = "property_State")
     private char propertyState;
+
+    public Property(){
+
+    }
 
 
     public Property(String[] parameters)  {
@@ -52,7 +51,6 @@ public class Property implements Serializable {
         this.propertyPrice = Float.parseFloat(parameters[4].substring(0, parameters[4].length() - 3).replace(",","."));
         this.propertyInDate =LocalDate.parse(parameters[5].substring(0,4)+"-" + parameters[5].substring(4,6)+"-"+ parameters[5].substring(6,8));
         this.propertyState = parameters[7].charAt(0);
-         logger.info("Zaevidovanie majektu");
     }
 
     public int getPropertyId() {
@@ -132,55 +130,54 @@ public class Property implements Serializable {
                 propertyState ;
     }
 
-    /*public static void insertProperty (Property property, Connection connect){
-        int id = 0;
-        String SQL = "INSERT INTO PROPERTY VALUES(?,?,?,?,?,?,?,?)";
-        System.out.println(java.sql.Date.valueOf(property.getPropertyInDate()));
+    public static List<Property> getProperties(EntityManager em) {
+
+        String strQuery = "SELECT p FROM Property p WHERE p.id IS NOT NULL";
+
+        // Issue the query and get a matching Customer
+        TypedQuery<Property> tq = em.createQuery(strQuery, Property.class);
+        List<Property> properties = null;
         try {
-            PreparedStatement pstmt = connect.prepareStatement(SQL, Statement.RETURN_GENERATED_KEYS);
-            pstmt.setInt(1,property.getPropertyId());
-            pstmt.setString(2, property.getPropertyName());
-            pstmt.setString(3, property.getPropertyRoom());
-            pstmt.setInt(4,property.getPropertyType());
-            pstmt.setFloat(5,property.getPropertyPrice());
-            pstmt.setDate(6, java.sql.Date.valueOf(property.getPropertyInDate()));
-            if (property.getPropertyOutDate() == null){
-                pstmt.setNull(7,java.sql.Types.DATE);
-            }
-            else{
-                pstmt.setDate(7, java.sql.Date.valueOf(property.getPropertyOutDate()));
-            }
-            pstmt.setString(8, String.valueOf(property.getPropertyState()));
-
-            int affectedRows = pstmt.executeUpdate();
-            // check the affected rows
-            if (affectedRows > 0) {
-                // get the ID back
-                try (ResultSet rs = pstmt.getGeneratedKeys()) {
-                    if (rs.next()) {
-                        id = rs.getInt(1);
-                    }
-                } catch (SQLException ex) {
-                    System.out.println(ex.getMessage());
-                }
-            }
-        } catch (SQLException ex) {
-            System.out.println(ex.getMessage());
+            // Get matching customer object and output
+            properties = tq.getResultList();
         }
-        System.out.println(id);
-    }*/
-
-    @Transactional
-    public void insertWithQuery(Property property) {
-        entityManager.createNativeQuery("INSERT INTO property VALUES (?,?,?,?,?,?,?,?)")
-                .setParameter(1, property.getPropertyId())
-                .setParameter(2, property.getPropertyName())
-                .setParameter(3, property.getPropertyRoom())
-                .setParameter(4, property.getPropertyType())
-                .setParameter(5, property.getPropertyPrice())
-                .setParameter(6, property.getPropertyInDate())
-                .setParameter(7, property.getPropertyOutDate())
-                .setParameter(8, property.getPropertyState())
-                .executeUpdate();
+        catch(NoResultException ex) {
+            ex.printStackTrace();
+        }
+        return properties;
     }
+
+    public static boolean propertyValidation(Property p){
+        if (p.getPropertyType() != 0 && p.getPropertyType() != 1){
+            System.out.println("zla hodnota typu");
+            return false;
+        }
+
+        if (p.getPropertyState() != 'V' && p.getPropertyState() != 'M' && p.getPropertyState() != 'O'){
+            System.out.println("zla hodnota state");
+            return false;
+        }
+        else return true;
+
+    }
+
+    public static boolean typeValidation(Property p){
+        if (p.getPropertyType() != 0 && p.getPropertyType() != 1){
+            //System.out.println("zla hodnota typu");
+            return false;
+        }
+        else
+            return true;
+
+    }
+
+    public static boolean stateValidation(Property p){
+        if (p.getPropertyState() != 'V' && p.getPropertyState() != 'M' && p.getPropertyState() != 'O'){
+            System.out.println("zla hodnota state");
+            return false;
+        }
+        else return true;
+    }
+
+
 }
