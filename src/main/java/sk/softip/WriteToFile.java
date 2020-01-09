@@ -6,7 +6,7 @@ import java.io.IOException;
 public class WriteToFile {
 
 
-    public static <T> void writeToFile (T element,String fileName, boolean append) throws IOException
+   public static <T> void writeToFile (T element,String fileName, boolean append) throws IOException
     {
 
         FileWriter fileWriter = new FileWriter(fileName,append);
@@ -14,4 +14,6 @@ public class WriteToFile {
         fileWriter.write(element.toString().replace("[","").replace(" ",";").replace(",","\n").replaceAll("\n;","\n").replace("]",""));
         fileWriter.close();
     }
+
+
 }

@@ -2,14 +2,12 @@ package sk.softip;
 import org.apache.log4j.Logger;
 
 import javax.persistence.*;
-import javax.validation.Valid;
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.List;
 
 @Entity
-@Table(name = "Property")
-@Valid
+@Table(name = "property")
 public class Property implements Serializable {
     private static  final long serialVersionUID = 1L;
 
@@ -18,6 +16,7 @@ public class Property implements Serializable {
     private int propertyId;
     @Column(name = "property_Name", unique = true, nullable = false)
     private  String propertyName;
+
     @Column(name = "property_Room")
     private  String propertyRoom;
     @Column(name = "property_Type", nullable = false)
@@ -147,7 +146,7 @@ public class Property implements Serializable {
         return properties;
     }
 
-    public static boolean propertyValidation(Property p){
+/*    public static boolean propertyValidation(Property p){
         if (p.getPropertyType() != 0 && p.getPropertyType() != 1){
             System.out.println("zla hodnota typu");
             return false;
@@ -178,6 +177,6 @@ public class Property implements Serializable {
         }
         else return true;
     }
-
+*/
 
 }

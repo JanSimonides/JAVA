@@ -11,9 +11,9 @@
         <class>sk.softip.Property</class>
         <properties>
             <property name="javax.persistence.jdbc.driver" value="org.postgresql.Driver" />
-            <property name="javax.persistence.jdbc.url" value="jdbc:postgresql://localhost/Softip" />
-            <property name="javax.persistence.jdbc.user" value="postgres" />
-            <property name="javax.persistence.jdbc.password" value="qwe" />
+            <property name="javax.persistence.jdbc.url" value="jdbc:postgresql://localhost/pokus" />
+            <property name="javax.persistence.jdbc.user" value="admin" />
+            <property name="javax.persistence.jdbc.password" value="asd" />
         </properties>
     </persistence-unit>
 </persistence>

@@ -1,8 +1,0 @@
-2020-01-04 13:49:27,691 +0100 [main] ERROR (App.java:44) - Pokus o opakovany import: inventuraVzor2.csv
-2020-01-04 13:49:27,706 +0100 [main] ERROR (ReadFromCSV.java:48) - Zla hodnota property_type: 3 v subore: inventuraVzor1.csv
-2020-01-04 13:49:27,706 +0100 [main] ERROR (ReadFromCSV.java:45) - Zla hodnota property_state: X v subore: inventuraVzor2.csv
-2020-01-04 13:49:27,706 +0100 [main] ERROR (ReadFromCSV.java:45) - Zla hodnota property_state: A v subore: inventuraVzor5.csv
-2020-01-04 13:49:27,706 +0100 [main] ERROR (ReadFromCSV.java:48) - Zla hodnota property_type: 5 v subore: inventuraVzor5.csv
-2020-01-04 13:49:27,753 +0100 [main] WARN  (App.java:66) - Udaj nebol pridany do databazy: 1 Majetok1 Room1 3 12.15 2010-01-01 null O
-2020-01-04 13:49:27,800 +0100 [main] WARN  (App.java:66) - Udaj nebol pridany do databazy: 99 Majetok15 Room19 0 120.15 2010-01-01 null X
-2020-01-04 13:49:27,800 +0100 [main] WARN  (App.java:66) - Udaj nebol pridany do databazy: 8520 Majetok17 Room162 5 55.29 2018-04-02 null A
